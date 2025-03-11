@@ -10,9 +10,14 @@ services:
       - ./backend:/code
     environment:
       - MONGO_URI=mongodb://mongo:27017/mern-db
-    command: ["npm", "run", "dev"]
+    command: ["npm", "run", "dev"]  # Assuming you use `npm run dev` to run the backend in watch mode
     depends_on:
       - mongo
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /code
 
   frontend:
     build:
@@ -22,9 +27,16 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/code
-    command: ["npm", "start"]
+    command: ["npm", "start"]  # React app will be running in watch mode by default when using `npm start`
     depends_on:
       - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /code
 
   mongo:
     image: "mongo:latest"
